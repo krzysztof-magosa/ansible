@@ -49,7 +49,7 @@
 # Agreement.
 
 import os
-
+import platform
 
 def ismount(path):
     """Test whether a path is a mount point
@@ -87,4 +87,13 @@ def ismount(path):
         return True     # path/.. on a different device as path
     if s1.st_ino == s2.st_ino:
         return True     # path/.. is the same i-node as path, i.e. path=='/'
+
+    # Support for situation when mounts are nested
+    if platform.system() == "Linux":
+        with open("/proc/mounts") as mounts:
+            for line in mounts:
+                components = line.split(" ")
+                if path == components[1]:
+                    return True
+
     return False
